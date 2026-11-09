@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Street Sprint V2</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
     <script type="importmap">
     {
@@ -27,11 +26,19 @@
             color: white;
         }
 
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
+   
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+}
+
+html, body {
+    touch-action: none;
+    overscroll-behavior: none;
+}
+
 
         #hud {
             position: absolute;
@@ -1036,6 +1043,42 @@ backButton.addEventListener("click", () => {
             if (event.key.toLowerCase() === "p") {
                 togglePause();
             }
+        });
+
+        // ==================================
+        // MOBILE SWIPE STEERING
+        // ==================================
+
+        let swipeStartX = null;
+        let swipeStartY = null;
+
+        document.addEventListener("pointerdown", event => {
+            if (event.pointerType !== "touch") return;
+
+            swipeStartX = event.clientX;
+            swipeStartY = event.clientY;
+        });
+
+        document.addEventListener("pointerup", event => {
+            if (swipeStartX === null) return;
+
+            const deltaX = event.clientX - swipeStartX;
+            const deltaY = event.clientY - swipeStartY;
+
+            if (
+                Math.abs(deltaX) > 45 &&
+                Math.abs(deltaX) > Math.abs(deltaY)
+            ) {
+                changeLane(deltaX > 0 ? 1 : -1);
+            }
+
+            swipeStartX = null;
+            swipeStartY = null;
+        });
+
+        document.addEventListener("pointercancel", () => {
+            swipeStartX = null;
+            swipeStartY = null;
         });
 
         // ==================================
